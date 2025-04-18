@@ -2,6 +2,7 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json());
@@ -12,16 +13,17 @@ app.get('/', (req, res) => {
 
 app.post('/generate', async (req, res) => {
   const url = req.body.url || 'https://example.com';
+  const id = crypto.randomBytes(4).toString('hex');
+  const filePath = path.join(__dirname, `output-${id}.pdf`);
 
   try {
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
+
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
-
-    const filePath = path.join(__dirname, 'output.pdf');
 
     await page.pdf({
       path: filePath,
@@ -32,12 +34,11 @@ app.post('/generate', async (req, res) => {
 
     await browser.close();
 
-    res.download(filePath, 'output.pdf', err => {
-      if (err) {
-        console.error('Error sending file:', err);
-      }
-      fs.unlinkSync(filePath); // delete the file after sending
+    res.download(filePath, 'generated.pdf', err => {
+      fs.unlink(filePath, () => {}); // delete even if error
+      if (err) console.error('Download error:', err);
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'PDF generation failed' });
