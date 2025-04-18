@@ -19,7 +19,8 @@ app.post('/generate', async (req, res) => {
   try {
     const browser = await puppeteer.launch({
       headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+     args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  cacheDirectory: '/opt/render/.cache/puppeteer'
     });
 
     const page = await browser.newPage();
