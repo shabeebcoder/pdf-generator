@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "postinstall": "npx puppeteer browsers install chrome --path=/opt/render/.cache/puppeteer"
-  },
+    "start": "node index.js"
+    },
   "keywords": [],
   "author": "shabeebcoder",
   "license": "ISC",
